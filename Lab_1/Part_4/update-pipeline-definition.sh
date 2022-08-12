@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #colors
 alert=$'\e[1;31m'
 info=$'\e[1;33m'
@@ -59,6 +58,7 @@ fi
 resultFile="$(date +%F)-$pipeline"
 result=$(jq "del(.metadata) | .pipeline.version += 1 | .pipeline.stages[0].actions[0].configuration.Branch = \"$branch\" | .pipeline.stages[0].actions[0].configuration.Owner = \"$owner\" | .pipeline.stages[0].actions[0].configuration.PollForSourceChanges = \"$pollForSourceChanges\" | .pipeline.stages[0].actions[0].configuration.Repo = \"repository\"" $pipeline)
 
-echo $result | jq > $resultFile 
+echo $result | jq  > $resultFile 
 
-jq "(.. | .EnvironmentVariables[]? | select(.values | contains(\"BUILD_CONFIGURATION\"))).value |= \"$build\"" $resultFile > $resultFile
+#cat <<< $(jq ".pipeline.stages[] | .actions[] | .configuration.EnvironmentVariables? | select(. != null) | fromjson | .[] | .value |= \"$build\" | tojson" $resultFile) > $resultFile 
+#cat <<< $(jq "..|.EnvironmentVariables? | select (. != null) | fromjson | .[] | .value |= \"$build\" | tojson" $resultFile) > $resultFile
